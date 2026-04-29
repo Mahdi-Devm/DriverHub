@@ -1,0 +1,18 @@
+{
+  "name": "DriverHub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm dev:web & pnpm dev:api",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm build:types && pnpm build:api && pnpm build:web",
+    "build:types": "pnpm --filter shared-types build",
+    "build:api": "pnpm --filter api build",
+    "build:web": "pnpm --filter web build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

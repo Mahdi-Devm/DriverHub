@@ -1,0 +1,30 @@
+{
+  "name": "@driverhub/shared-utils",
+  "version": "1.0.0",
+  "description": "Shared utility functions",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "utils",
+    "helpers",
+    "shared",
+    "helper"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0"
+  },
+  "dependencies": {}
+}
