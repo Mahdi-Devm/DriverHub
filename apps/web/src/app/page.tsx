@@ -1,3 +1,10 @@
+import SectionLayout from "@/core/components/custom/ui/wrapper/SectionLayout";
+
 export default function Home() {
-  return <div>132</div>;
+  return (
+    <SectionLayout>
+      <h1>1231sadasd</h1>
+      <span>safdg </span>
+    </SectionLayout>
+  );
 }
