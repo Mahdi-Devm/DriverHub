@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
 } from 'class-validator';
@@ -43,8 +44,9 @@ export class CreateCompletProfileDto {
   hasGlasses: boolean;
 
   @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  medicalConditions: string;
+  medicalConditions?: string;
 
   @IsNotEmpty()
   @IsString()
