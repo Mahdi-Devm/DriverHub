@@ -27,11 +27,26 @@ export class ProfileDriver extends BaseEntity {
   @Column({ nullable: true })
   carColor: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true, nullable: true })
   bankAccountNumber: string;
 
   @Column({ nullable: true })
   certificateUrl: string;
+
+  @Column({ nullable: false })
+  age: number;
+
+  @Column({ unique: true, nullable: false })
+  nationalCode: number;
+
+  @Column({ nullable: false })
+  hasGlasses: boolean;
+
+  @Column({ nullable: false })
+  medicalConditions: string;
+
+  @Column({ nullable: false })
+  address: string;
 
   @Column({ default: false })
   isProfileComplete: boolean;

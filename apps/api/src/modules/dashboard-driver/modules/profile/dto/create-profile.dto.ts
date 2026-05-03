@@ -1,5 +1,12 @@
 import { GenderEnum } from '@shared/enums/gender.enum';
-import { IsEnum, IsNumber, IsString, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateBasicProfileDto {
   @IsString()
@@ -23,4 +30,23 @@ export class CreateBasicProfileDto {
 
   @IsString()
   bankAccountNumber: string;
+}
+export class CreateCompletProfileDto {
+  @IsNotEmpty()
+  age: number;
+
+  @IsNumber()
+  nationalCode: number;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  hasGlasses: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  medicalConditions: string;
+
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 }

@@ -1,11 +1,10 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +15,10 @@ import { SkipProfileCheck } from '@shared/decorators/skip-profile-driver.decorat
 import { UserInfo } from '@shared/decorators/user.decorator';
 import { GenderEnum } from '@shared/enums/gender.enum';
 import { Roles } from '@shared/enums/role.enum';
-import { CreateBasicProfileDto } from './dto/create-profile.dto';
+import {
+  CreateBasicProfileDto,
+  CreateCompletProfileDto,
+} from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
 
@@ -76,23 +78,21 @@ export class ProfileController {
     );
   }
 
-  @Get()
-  findAll() {
-    return this.profileService.findAll();
+  @Post('complet-profile')
+  async completProfile(
+    @Body() createCompletProfile: CreateCompletProfileDto,
+    @UserInfo('id') id: string,
+  ) {
+    return this.profileService.completProfile(createCompletProfile, id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+  getProfile(@Param('id') id: string) {
+    return this.profileService.getProfile(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+    return this.profileService.update(id, updateProfileDto);
   }
 }

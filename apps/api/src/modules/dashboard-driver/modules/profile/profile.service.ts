@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileService } from '@shared/services/file.service';
 import { Repository } from 'typeorm';
-import { CreateBasicProfileDto } from './dto/create-profile.dto';
+import {
+  CreateBasicProfileDto,
+  CreateCompletProfileDto,
+} from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileDriver } from './entities/profile.entity';
 
@@ -34,7 +37,6 @@ export class ProfileService {
       carColor: createBasicProfile.carColor,
       bankAccountNumber: createBasicProfile.bankAccountNumber,
       certificateUrl: certificateUrl,
-      isProfileComplete: true,
     });
     const savedProfile = await this.profileRepository.save(profile);
 
@@ -44,19 +46,75 @@ export class ProfileService {
     };
   }
 
-  findAll() {
-    return `This action returns all profile`;
-  }
+  async getProfile(userId: string) {
+    const profile = await this.profileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
-  }
+    if (!profile) {
+      throw new BadRequestException('پروفایل یافت نشد');
+    }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+    return profile;
   }
+  async completProfile(
+    createCompletProfile: CreateCompletProfileDto,
+    userId: string,
+  ) {
+    const { nationalCode } = createCompletProfile;
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+    const existUser = await this.profileRepository.findOne({
+      where: { nationalCode: nationalCode },
+    });
+
+    if (existUser) {
+      throw new BadRequestException(
+        'این کد ملی قبلاً برای پروفایل دیگری ثبت شده است',
+      );
+    }
+    const profile = await this.profileRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!profile) {
+      throw new BadRequestException(
+        'پروفایل یافت نشد. لطفاً ابتدا اطلاعات اولیه را ثبت کنید',
+      );
+    }
+
+    if (profile.isProfileComplete) {
+      throw new BadRequestException('پروفایل شما قبلاً تکمیل شده است');
+    }
+
+    profile.nationalCode = createCompletProfile.nationalCode;
+    profile.medicalConditions = createCompletProfile.medicalConditions;
+    profile.address = createCompletProfile.address;
+    profile.hasGlasses = createCompletProfile.hasGlasses;
+    profile.age = createCompletProfile.age;
+    profile.isProfileComplete = true;
+
+    const updatedProfile = await this.profileRepository.save(profile);
+
+    return {
+      message: 'پروفایل با موفقیت تکمیل شد',
+      data: updatedProfile,
+    };
+  }
+  async update(userId: string, updateProfileDto: UpdateProfileDto) {
+    const profile = await this.profileRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!profile) {
+      throw new BadRequestException('پروفایل یافت نشد');
+    }
+    Object.assign(profile, updateProfileDto);
+    const updatedProfile = await this.profileRepository.save(profile);
+
+    return {
+      message: 'پروفایل با موفقیت بروزرسانی شد',
+      data: updatedProfile,
+    };
   }
 }

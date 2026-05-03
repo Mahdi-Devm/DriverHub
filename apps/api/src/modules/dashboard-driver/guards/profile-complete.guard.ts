@@ -38,7 +38,7 @@ export class ProfileCompleteGuard implements CanActivate {
       where: { user: { id: user.id } },
     });
 
-    if (!profile || !profile.isProfileComplete) {
+    if (!profile) {
       throw new ForbiddenException('لطفاً ابتدا پروفایل خود را تکمیل کنید');
     }
 

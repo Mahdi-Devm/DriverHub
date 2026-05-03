@@ -1,4 +1,30 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateBasicProfileDto } from './create-profile.dto';
+import { GenderEnum } from '@shared/enums/gender.enum';
+import { IsBoolean, IsEnum, IsNumber, IsString, Min } from 'class-validator';
 
-export class UpdateProfileDto extends PartialType(CreateBasicProfileDto) {}
+export class UpdateProfileDto {
+  @IsString()
+  carModel: string;
+
+  @IsString()
+  carColor: string;
+  @IsNumber()
+  @Min(0)
+  experienceYears: number;
+  @IsString()
+  fullName: string;
+
+  @IsEnum(GenderEnum)
+  gender: GenderEnum;
+
+  @IsNumber()
+  age: number;
+
+  @IsBoolean()
+  hasGlasses: boolean;
+
+  @IsString()
+  medicalConditions: string;
+
+  @IsString()
+  address: string;
+}
