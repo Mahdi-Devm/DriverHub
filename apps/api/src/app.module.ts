@@ -12,6 +12,8 @@ import { RedisModule } from '@shared/modules/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { DashboardDriverModule } from './modules/dashboard-driver/dashboard-driver.module';
+import { DashboardAdminModule } from './modules/dashboard-admin/dashboard-admin.module';
+import { DashboardTraineeModule } from './modules/dashboard-trainee/dashboard-trainee.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { DashboardDriverModule } from './modules/dashboard-driver/dashboard-driv
     UserModule,
     CookieModule,
     DashboardDriverModule,
+    DashboardAdminModule,
+    DashboardTraineeModule,
   ],
   providers: [
     {

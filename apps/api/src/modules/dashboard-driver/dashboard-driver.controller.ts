@@ -17,9 +17,9 @@ export class DashboardDriverController {
     private readonly dashboardDriverService: DashboardDriverService,
   ) {}
 
-  @Post()
-  create(@Body() createDashboardDriverDto: CreateDashboardDriverDto) {
-    return this.dashboardDriverService.create(createDashboardDriverDto);
+  @Post('create-profile')
+  createProfile(@Body() createDashboardDriverDto: CreateDashboardDriverDto) {
+    return this.dashboardDriverService.createProfile(createDashboardDriverDto);
   }
 
   @Get()

@@ -4,7 +4,7 @@ import { UpdateDashboardDriverDto } from './dto/update-dashboard-driver.dto';
 
 @Injectable()
 export class DashboardDriverService {
-  create(createDashboardDriverDto: CreateDashboardDriverDto) {
+  createProfile(createDashboardDriverDto: CreateDashboardDriverDto) {
     return 'This action adds a new dashboardDriver';
   }
 
