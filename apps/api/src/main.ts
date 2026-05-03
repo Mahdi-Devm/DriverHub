@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { initSwagger } from '@shared/config/swagger.config';
 import { AllExceptionsFilter } from '@shared/filter/exception.filter';
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,6 +16,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
   app.useGlobalFilters(new AllExceptionsFilter());
   initSwagger(app);
   await app.listen(process.env.PORT ?? 3002, async () => {
