@@ -88,7 +88,7 @@ export class ProfileService {
     }
 
     profile.nationalCode = createCompletProfile.nationalCode;
-    profile.medicalConditions = createCompletProfile.medicalConditions;
+    profile.medicalConditions = createCompletProfile?.medicalConditions || '';
     profile.address = createCompletProfile.address;
     profile.hasGlasses = createCompletProfile.hasGlasses;
     profile.age = createCompletProfile.age;

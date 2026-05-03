@@ -23,11 +23,11 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profile-driver')
+@RolesDecorator(Roles.TEACHER)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Post('introduction')
-  @RolesDecorator(Roles.TEACHER)
   @UseInterceptors(FileInterceptor('file'))
   @SkipProfileCheck()
   @ApiConsumes('multipart/form-data')
