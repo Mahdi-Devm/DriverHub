@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { DashboardTraineeService } from './dashboard-trainee.service';
 import { CreateDashboardTraineeDto } from './dto/create-dashboard-trainee.dto';
 import { UpdateDashboardTraineeDto } from './dto/update-dashboard-trainee.dto';
 
 @Controller('dashboard-trainee')
 export class DashboardTraineeController {
-  constructor(private readonly dashboardTraineeService: DashboardTraineeService) {}
+  constructor(
+    private readonly dashboardTraineeService: DashboardTraineeService,
+  ) {}
 
   @Post()
   create(@Body() createDashboardTraineeDto: CreateDashboardTraineeDto) {
@@ -23,7 +33,10 @@ export class DashboardTraineeController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDashboardTraineeDto: UpdateDashboardTraineeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDashboardTraineeDto: UpdateDashboardTraineeDto,
+  ) {
     return this.dashboardTraineeService.update(+id, updateDashboardTraineeDto);
   }
 
