@@ -1,42 +1,92 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
   Post,
+  Req,
+  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAuthDto } from '../dto/create-auth.dto';
-import { UpdateAuthDto } from '../dto/update-auth.dto';
+import { Public } from '@shared/decorators/public.decorator';
+import { Roles } from '@shared/enums/role.enum';
+import { CookieService } from '@shared/services/cookie.service';
+import { Request, Response } from 'express';
+import { CreateAuthDto } from '../dto/create-phone.dto';
+import { VerifyOtpDto } from '../dto/verify-otp.dto';
 import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+  ) {}
 
-  @Post()
+  @Post('request-otp')
+  @Public()
   async requestOtp(@Body() phone: CreateAuthDto) {
     return this.authService.requestOtp(phone);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('verify-otp/trainee')
+  @Public()
+  async verifyOtpForTrainee(
+    @Body() verifyDto: VerifyOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.verifyOtp(verifyDto, Roles.TRAINEE);
+
+    this.cookieService.setRefreshToken(res, result.refreshToken, 15);
+
+    return {
+      message: result.message,
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Post('verify-otp/teacher')
+  @Public()
+  async verifyOtpForTeacher(
+    @Body() verifyDto: VerifyOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.verifyOtp(verifyDto, Roles.TEACHER);
+
+    this.cookieService.setRefreshToken(res, result.refreshToken, 15);
+
+    return {
+      message: result.message,
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  @Post('refresh')
+  async refreshTokens(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = this.cookieService.getRefreshToken(req);
+    if (!refreshToken) {
+      throw new UnauthorizedException('رفرش توکن یافت نشد');
+    }
+
+    const result = await this.authService.refreshTokens(refreshToken);
+
+    this.cookieService.setRefreshToken(res, result.refreshToken, 15);
+
+    return { accessToken: result.accessToken };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = this.cookieService.getRefreshToken(req);
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    this.cookieService.clearRefreshToken(res);
+
+    return { message: 'با موفقیت خارج شدید' };
   }
 }

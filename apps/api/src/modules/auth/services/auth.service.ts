@@ -1,24 +1,94 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from '../dto/create-auth.dto';
-import { UpdateAuthDto } from '../dto/update-auth.dto';
+import { User } from '@core/user/entities/auth.entity';
+import { UserService } from '@core/user/user.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Roles } from '@shared/enums/role.enum';
+import { CacheService } from '@shared/services/cache.service';
+import { generateOtp } from '@shared/utils/code-generator.util';
+import { Repository } from 'typeorm';
+import { CreateAuthDto } from '../dto/create-phone.dto';
+import { VerifyOtpDto } from '../dto/verify-otp.dto';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
-  async requestOtp(phone: CreateAuthDto) {}
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly cacheService: CacheService,
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
+  ) {}
+  async requestOtp(createAuthDto: CreateAuthDto) {
+    const { phone } = createAuthDto;
+    const exsistUser = await this.userService.findByPhone(phone);
 
-  findAll() {
-    return `This action returns all auth`;
+    if (exsistUser) {
+      throw new BadRequestException('این شماره قبلاً ثبت شده است');
+    }
+    const exsistOtp = await this.cacheService.get(`otp:${phone}`);
+    if (exsistOtp) {
+      throw new BadRequestException('کد تایید ارسال شده');
+    }
+    const otp = generateOtp(6);
+    await this.cacheService.set(`otp:${phone}`, otp, 120);
+
+    console.log(`OTP for ${phone}`);
+
+    return { message: 'کد تایید ارسال شد', expiresIn: 120, otp };
+  }
+  async verifyOtp(verifyDto: VerifyOtpDto, roleSend: Roles) {
+    const { phone, otp } = verifyDto;
+    const exsistUser = await this.userService.findByPhone(phone);
+
+    if (exsistUser) {
+      throw new BadRequestException('این شماره قبلاً ثبت شده است');
+    }
+    const exsistOtp = await this.cacheService.get(`otp:${phone}`);
+    if (!exsistOtp) {
+      throw new BadRequestException(
+        'کد تایید منقضی شده است. لطفاً دوباره درخواست کنید',
+      );
+    }
+    if (exsistOtp !== otp.toString()) {
+      throw new BadRequestException('کد تایید اشتباه است');
+    }
+
+    let role: Roles;
+    if (roleSend === Roles.TEACHER) {
+      role = Roles.TEACHER;
+    } else if (roleSend === Roles.TRAINEE) {
+      role = Roles.TRAINEE;
+    } else {
+      throw new BadRequestException('نقش کاربری نامعتبر است');
+    }
+
+    const newUser = await this.userService.create({
+      phone,
+      role,
+      isActive: true,
+    });
+
+    await this.cacheService.del(`otp:${phone}`);
+    const tokens = await this.tokenService.generateTokens(newUser);
+    return {
+      message: 'ثبت‌ نام با موفقیت انجام شد',
+      user: {
+        id: newUser.id,
+        phone: newUser.phone,
+        role: newUser.role,
+      },
+      ...tokens,
+    };
+  }
+  async refreshTokens(refreshToken: string) {
+    const tokens = await this.tokenService.refreshAccessToken(refreshToken);
+    return tokens;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async logout(refreshToken: string) {
+    const payload = await this.tokenService.validateRefreshToken(refreshToken);
+    await this.tokenService.revokeRefreshToken(payload.sub);
   }
 }
