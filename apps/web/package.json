@@ -42,7 +42,7 @@
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.6",
     "postcss": "^8.5.13",
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
