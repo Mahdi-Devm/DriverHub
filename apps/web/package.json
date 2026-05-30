@@ -48,7 +48,7 @@
     "postcss": "^8.5.13",
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5",
+    "typescript": "^6",
     "storybook": "^10.4.0",
     "@storybook/nextjs-vite": "^10.4.0",
     "@chromatic-com/storybook": "^5.2.1",
