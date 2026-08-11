@@ -22,7 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "input-otp": "^1.4.2",
-    "lucide-react": "^1.14.0",
+    "lucide-react": "^1.16.0",
     "next": "16.2.4",
     "nextjs-toploader": "^3.9.17",
     "radix-ui": "^1.4.3",
